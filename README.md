@@ -1,2 +1,2 @@
 # web_crawler
-web crawler for HTTP course
+Web crawler for the Learn HTTP course
