@@ -1,12 +1,26 @@
+const {JSDOM} = require('jsdom')
+
 function getURLsFromHTML(htmlBody, baseURL) {
     const urls = []
     const dom = new JSDOM(htmlBody)
-    const aElements = dom.window.document.querySelectorAll('a')
-    for (const aElement of aElements) {
-        if (aElement.href.slice(0, 1) === '/') {
-            urls.push(`${baseURL}${aElement.href}`)
+    const linkElements = dom.window.document.querySelectorAll('a')
+    for (const linkElement of linkElements) {
+        if (linkElement.href.startsWith('/')) {
+            // Handle relative URLs by combining with baseURL
+            try {
+                const urlObj = new URL(`${baseURL}${linkElement.href}`)
+                urls.push(urlObj.href)
+            } catch (err) {
+                console.log(`Error with relative url: ${err.message}`)
+            }
         } else {
-            urls.push(aElement.href)
+            //absolute
+            try {
+                const urlObj = new URL(linkElement.href)
+                urls.push(urlObj.href)
+            } catch (err) {
+                console.log(`Error with absolute url: ${err.message}`)
+            }
         }
     }
     return urls
@@ -21,5 +35,8 @@ function normalizeUrl(urlString) {
   return hostpath;
 }
 
-module.exports = { normalizeUrl };
+module.exports = {
+    normalizeUrl,
+    getURLsFromHTML,
+};
  
